@@ -1,5 +1,5 @@
 const outputs=[];
-const k = 3;
+//const k = 3;
 
 
 function onScoreUpdate(dropPosition, bounciness, size, bucketLabel) {
@@ -10,26 +10,36 @@ function onScoreUpdate(dropPosition, bounciness, size, bucketLabel) {
 
 function runAnalysis() {
     
-    const testSetSize = 10;
+    const testSetSize = 50;
     const [testSet, trainingSet]=splitDataset(outputs, testSetSize);     //array return by splidataset will be retuned and stored in testset and trainingset
+//    
+//    let numberCorrect = 0;
+//    
+//    for(let i=0;i< testSet.length; i++) {
+//        const bucket = knn(trainingSet, testSet[i][0]);
+//        if(bucket === testSet[i][3]) {
+//            numberCorrect++;
+//        }
+//    }
+//    
+//    console.log('Accuracy: '+ ((numberCorrect/testSetSize)*100)+'%');
+
+    _.range(1,15).forEach(k => { //_.range(1,15) = [1,2,3....14]
+    const accuracy=_.chain(testSet)
+                    .filter(testPoint => knn(trainingSet, testPoint[0],k) === testPoint[3])
+                    .size()
+                    .divide(testSetSize)
+                    .value()
     
-    let numberCorrect = 0;
+    console.log('For k: '+k+' Accuracy: '+accuracy);
     
-    for(let i=0;i< testSet.length; i++) {
-        const bucket = knn(trainingSet, testSet[i][0]);
-        if(bucket === testSet[i][3]) {
-            numberCorrect++;
-        }
-    }
-    
-    console.log('Accuracy: '+ ((numberCorrect/testSetSize)*100)+'%');
-    
+    });
 }
 
 //knn algo
 
-function knn(data, point) {
-
+function knn(data, point,k) {
+    
     return _.chain(data)
             .map(row => [distance(row[0],point), row[3] ])
             .sortBy(row => row[0])
